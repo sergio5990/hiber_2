@@ -1,6 +1,7 @@
 package by.it;
 
 import by.it.util.SFUtil;
+import org.hibernate.LazyInitializationException;
 import org.hibernate.Session;
 import org.junit.After;
 import org.junit.Assert;
@@ -39,30 +40,20 @@ public class SessionFactoryTest {
 
     @Test
     public void loadTest() {
-        Session session = SFUtil.getSession();
-        Person person = new Person(null, 50, "Test", "Test");
-        session.beginTransaction();
-        session.saveOrUpdate(person);
-        session.getTransaction().commit();
-        session.close();
+        Person person = savePerson();
 
-        session = SFUtil.getSession();
+        Session session = SFUtil.getSession();
         Person loadedPerson = session.load(Person.class, person.getId());
         System.out.println("after load");
         loadedPerson.getAge();
         session.close();
     }
 
-    @Test
+    @Test(expected = LazyInitializationException.class)
     public void lazyLoadTest() {
-        Session session = SFUtil.getSession();
-        Person person = new Person(null, 50, "Test", "Test");
-        session.beginTransaction();
-        session.saveOrUpdate(person);
-        session.getTransaction().commit();
-        session.close();
+        Person person = savePerson();
 
-        session = SFUtil.getSession();
+        Session session = SFUtil.getSession();
         Person loadedPerson = session.load(Person.class, person.getId());
         System.out.println(loadedPerson.getClass());
         session.clear();
@@ -72,14 +63,9 @@ public class SessionFactoryTest {
 
     @Test
     public void getTest() {
-        Session session = SFUtil.getSession();
-        Person person = new Person(null, 50, "Test", "Test");
-        session.beginTransaction();
-        session.saveOrUpdate(person);
-        session.getTransaction().commit();
-        session.close();
+        Person person = savePerson();
 
-        session = SFUtil.getSession();
+        Session session = SFUtil.getSession();
         Person loadedPerson = session.get(Person.class, person.getId());
         System.out.println(loadedPerson.getClass());
         session.close();
@@ -87,14 +73,9 @@ public class SessionFactoryTest {
 
     @Test
     public void updateTest() {
-        Session session = SFUtil.getSession();
-        Person person = new Person(null, 50, "Test", "Test");
-        session.beginTransaction();
-        session.saveOrUpdate(person);
-        session.getTransaction().commit();
-        session.close();
+        Person person = savePerson();
 
-        session = SFUtil.getSession();
+        Session session = SFUtil.getSession();
         session.beginTransaction();
         Person loadedPerson = session.load(Person.class, person.getId());
         loadedPerson.setAge(42);
@@ -104,18 +85,24 @@ public class SessionFactoryTest {
 
     @Test
     public void updateFlushTest() {
-        Session session = SFUtil.getSession();
-        Person person = new Person(null, 50, "Test", "Test");
-        session.beginTransaction();
-        session.saveOrUpdate(person);
-        session.getTransaction().commit();
-        session.close();
+        Person person = savePerson();
+        Session session;
 
         session = SFUtil.getSession();
         Person loadedPerson = session.get(Person.class, person.getId());
         loadedPerson.setAge(42);
         session.refresh(loadedPerson);
         session.close();
+    }
+
+    private Person savePerson() {
+        Session session = SFUtil.getSession();
+        Person person = new Person(null, 50, "Test", "Test");
+        session.beginTransaction();
+        session.saveOrUpdate(person);
+        session.getTransaction().commit();
+        session.close();
+        return person;
     }
 
     @Test
