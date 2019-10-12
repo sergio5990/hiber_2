@@ -41,7 +41,6 @@ public class SessionFactoryTest {
     @Test
     public void loadTest() {
         Person person = savePerson();
-
         Session session = SFUtil.getSession();
         Person loadedPerson = session.load(Person.class, person.getId());
         System.out.println("after load");
@@ -52,7 +51,6 @@ public class SessionFactoryTest {
     @Test(expected = LazyInitializationException.class)
     public void lazyLoadTest() {
         Person person = savePerson();
-
         Session session = SFUtil.getSession();
         Person loadedPerson = session.load(Person.class, person.getId());
         System.out.println(loadedPerson.getClass());
@@ -64,7 +62,6 @@ public class SessionFactoryTest {
     @Test
     public void getTest() {
         Person person = savePerson();
-
         Session session = SFUtil.getSession();
         Person loadedPerson = session.get(Person.class, person.getId());
         System.out.println(loadedPerson.getClass());
@@ -74,7 +71,6 @@ public class SessionFactoryTest {
     @Test
     public void updateTest() {
         Person person = savePerson();
-
         Session session = SFUtil.getSession();
         session.beginTransaction();
         Person loadedPerson = session.load(Person.class, person.getId());
@@ -86,9 +82,7 @@ public class SessionFactoryTest {
     @Test
     public void updateFlushTest() {
         Person person = savePerson();
-        Session session;
-
-        session = SFUtil.getSession();
+        Session session = SFUtil.getSession();
         Person loadedPerson = session.get(Person.class, person.getId());
         loadedPerson.setAge(42);
         session.refresh(loadedPerson);
